@@ -9,3 +9,8 @@ edition = "2018"
 [dependencies]
 actix-web = "1.0"
 listenfd = "0.3"
+diesel = { version = "1.4", features = ["postgres", "uuid"] }
+dotenv = "0.14.1"
+serde = "1.0"
+serde_derive = "1.0.99"
+uuid = { version = "0.6", features = ["serde", "v4"] }

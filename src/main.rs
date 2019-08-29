@@ -1,7 +1,14 @@
 // systemfd --no-pid -s http::8080 -- cargo watch -x run
+#[macro_use]
+extern crate diesel;
+extern crate dotenv;
 
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder, get};
 use listenfd::ListenFd;
+
+pub mod schema;
+pub mod models;
+pub mod db;
 
 #[get("/hello")]
 fn index3() -> impl Responder {
@@ -32,4 +39,3 @@ fn main() {
 
     server.run().unwrap();
 }
-
