@@ -7,7 +7,7 @@ use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder, get}
 use listenfd::ListenFd;
 
 pub mod schema;
-pub mod models;
+pub mod app;
 pub mod db;
 
 #[get("/hello")]
@@ -20,7 +20,8 @@ fn index(_req: HttpRequest) -> impl Responder {
 }
 
 fn index2() -> impl Responder {
-    HttpResponse::Ok().body("Hello World again!")
+    let b = app::models::buildings::Building::new("fea".to_owned(), "segvr".to_owned());
+    HttpResponse::Ok().json(b)
 }
 
 fn main() {

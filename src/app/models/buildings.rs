@@ -1,4 +1,5 @@
-use super::schema::buildings;
+use crate::schema::buildings;
+
 use serde_derive::{Deserialize, Serialize};
 
 use diesel::prelude::*;
@@ -40,21 +41,21 @@ impl Building {
         }
     }
 
-    pub fn insert(conn: &PgConnection, building: &Building) -> Building {
+    fn insert(conn: &PgConnection, building: &Building) -> Building {
         diesel::insert_into(buildings::table)
             .values(building)
             .get_result(conn)
             .expect("Error saving new building")
     }
 
-    pub fn update(conn: &PgConnection, building: &Building) -> Building {
+    fn update(conn: &PgConnection, building: &Building) -> Building {
         diesel::update(buildings::table)
             .set(building)
             .get_result(conn)
             .expect("Error saving new building")
     }
 
-    pub fn get_all(conn: &PgConnection) -> Vec<Building> {
+    fn get_all(conn: &PgConnection) -> Vec<Building> {
         buildings::table.load::<Building>(conn)
             .expect("Error loading buildings")
     }
@@ -63,7 +64,7 @@ impl Building {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{Building, Connection};
     use crate::db;
     use diesel::result::Error;
 
