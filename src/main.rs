@@ -2,6 +2,8 @@
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+#[macro_use]
+extern crate lazy_static;
 
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder, get};
 use listenfd::ListenFd;
@@ -9,6 +11,7 @@ use listenfd::ListenFd;
 pub mod schema;
 pub mod app;
 pub mod db;
+pub mod utils;
 
 #[get("/hello")]
 fn index3() -> impl Responder {

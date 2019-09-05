@@ -7,16 +7,6 @@ use diesel::pg::PgConnection;
 
 use std::vec::Vec;
 
-#[derive(Queryable, Debug, Serialize, Deserialize)]
-pub struct User {
-    pub id: i64,
-    pub full_name: String,
-    pub job_title: String,
-    pub email: String,
-    pub profile_picture: String,
-
-}
-
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 pub struct Building {
     pub id: uuid::Uuid,
@@ -41,7 +31,7 @@ impl Building {
         }
     }
 
-    fn insert(conn: &PgConnection, building: &Building) -> Building {
+    /*fn insert(conn: &PgConnection, building: &Building) -> Building {
         diesel::insert_into(buildings::table)
             .values(building)
             .get_result(conn)
@@ -52,26 +42,26 @@ impl Building {
         diesel::update(buildings::table)
             .set(building)
             .get_result(conn)
-            .expect("Error saving new building")
+            .expect("Error saving building")
     }
 
     fn get_all(conn: &PgConnection) -> Vec<Building> {
         buildings::table.load::<Building>(conn)
             .expect("Error loading buildings")
-    }
+    }*/
 
 }
-
+/*
 #[cfg(test)]
 mod tests {
     use super::{Building, Connection};
     use crate::db;
     use diesel::result::Error;
 
-    #[test]
+    //#[test]
     fn test_create_new_building() {
 
-        let conn = db::establish_connection();
+        let conn = db::connection::establish_connection();
         
         conn.test_transaction::<_, Error, _>(|| {
             let name1 = String::from("Guy Laliberté");
@@ -94,9 +84,9 @@ mod tests {
         });
     }
     
-    #[test]
+    //#[test]
     fn test_update_building_info() {
-        let conn = db::establish_connection();
+        let conn = db::connection::establish_connection();
         
         conn.test_transaction::<_, Error, _>(|| {
             let name1 = String::from("Guy Laliberté");
@@ -116,3 +106,4 @@ mod tests {
 
     }
 }
+*/
