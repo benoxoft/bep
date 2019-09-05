@@ -33,7 +33,6 @@ pub struct User {
 
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
-
         self.id == other.id &&
         self.permission == other.permission &&
         self.full_name == other.full_name &&
@@ -166,6 +165,7 @@ mod tests {
         conn.test_transaction::<_, Error, _>(|| {
             let mut user = create_test_user();
             User::insert(&conn, &user);
+
             user.full_name = String::from("Bernard Landry");
             user.permission = 1;
             user.email = String::from("blandry@gmail.com");
@@ -173,6 +173,10 @@ mod tests {
             user.job_title = String::from("Coordinateur");
             user.profile_picture = String::from("new_picture.png");
             user.deleted = true;
+
+            // test the managed diesel updated_at
+            //use std::thread::sleep_ms;
+            //sleep_ms(2000);
 
             User::update(&conn, &user);
             let saved_user = User::get_one_by_id(&conn, user.id);
@@ -184,7 +188,9 @@ mod tests {
             assert_eq!(user.job_title, saved_user.job_title);
             assert_eq!(user.profile_picture, saved_user.profile_picture);
             assert_eq!(user.deleted, saved_user.deleted);
-
+            assert_eq!(user.created_at.timestamp(), saved_user.created_at.timestamp());
+            assert_eq!(user.deleted_at.timestamp(), saved_user.deleted_at.timestamp());
+            //assert_ne!(user.updated_at.timestamp(), saved_user.updated_at.timestamp());
 
             Ok(())
         });
