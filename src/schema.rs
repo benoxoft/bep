@@ -1,14 +1,14 @@
 table! {
     building_managers (id) {
         id -> Uuid,
-        full_name -> Nullable<Varchar>,
-        profile_picture -> Nullable<Varchar>,
+        full_name -> Varchar,
+        profile_picture -> Bytea,
         coordinates_id -> Nullable<Uuid>,
         linked_user_id -> Nullable<Uuid>,
         deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        deleted_at -> Nullable<Timestamp>,
+        deleted_at -> Timestamp,
     }
 }
 

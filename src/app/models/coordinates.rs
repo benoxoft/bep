@@ -85,7 +85,7 @@ impl Coordinate {
 
     fn get_one_by_id(conn: &PgConnection, coord_id: uuid::Uuid) -> Coordinate {
         dsl::coordinates.filter(dsl::id.eq(coord_id)).first(conn)
-            .expect("Could not find")
+            .expect("Could not find coordinates")
     }
     
 }

@@ -45,15 +45,15 @@ SELECT diesel_manage_updated_at('coordinates');
 
 
 CREATE TABLE building_managers ( -- organization
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    full_name VARCHAR,
-    profile_picture VARCHAR,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    full_name VARCHAR DEFAULT '' NOT NULL,
+    profile_picture BYTEA DEFAULT '' NOT NULL,
     coordinates_id UUID REFERENCES coordinates(id),
     linked_user_id UUID REFERENCES users(id),
     deleted BOOL DEFAULT 0::BOOL NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('building_managers');
