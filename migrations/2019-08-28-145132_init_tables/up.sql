@@ -63,15 +63,15 @@ SELECT diesel_manage_updated_at('building_managers');
 
 CREATE TABLE building_owners (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    full_name VARCHAR,
-    is_manager BOOL,
+    full_name VARCHAR DEFAULT '' NOT NULL,
+    is_manager BOOL DEFAULT FALSE NOT NULL,
     manager_id UUID REFERENCES building_managers(id),
     linked_user_id UUID REFERENCES users(id),
     coordinates_id UUID REFERENCES coordinates(id),
     deleted BOOL DEFAULT 0::BOOL NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('building_owners');

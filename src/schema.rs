@@ -15,15 +15,15 @@ table! {
 table! {
     building_owners (id) {
         id -> Uuid,
-        full_name -> Nullable<Varchar>,
-        is_manager -> Nullable<Bool>,
+        full_name -> Varchar,
+        is_manager -> Bool,
         manager_id -> Nullable<Uuid>,
         linked_user_id -> Nullable<Uuid>,
         coordinates_id -> Nullable<Uuid>,
         deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        deleted_at -> Nullable<Timestamp>,
+        deleted_at -> Timestamp,
     }
 }
 

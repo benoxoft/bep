@@ -88,8 +88,7 @@ mod tests {
     use super::{BuildingManager, Connection};
     use crate::db;
     use diesel::result::Error;
-    use uuid;
-
+    
     fn create_test_building_manager() -> BuildingManager {
         BuildingManager::new(
             String::from("MANAGER NAME"), 
