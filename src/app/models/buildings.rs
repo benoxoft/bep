@@ -1,16 +1,16 @@
 use crate::schema::buildings;
+use crate::schema::buildings::dsl;
 
 use chrono::Utc;
 use chrono::naive::NaiveDateTime;
 
-use serde_derive::{Deserialize, Serialize};
-
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
+use serde_derive::{Deserialize, Serialize};
+
 use std::vec::Vec;
 
-use crate::schema::buildings::dsl;
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 pub struct Building {
@@ -51,11 +51,11 @@ impl Building {
     ) -> Building {
         Building {
             id: uuid::Uuid::new_v4(),
-            owner_id: owner_id,
-            manager_id: manager_id,
-            respondant_id: respondant_id,
-            name: name,
-            address: address,
+            owner_id,
+            manager_id,
+            respondant_id,
+            name,
+            address,
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),

@@ -1,14 +1,13 @@
 use crate::schema::coordinates;
+use crate::schema::coordinates::dsl;
 
 use chrono::Utc;
 use chrono::naive::NaiveDateTime;
 
-use serde_derive::{Deserialize, Serialize};
-
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
-use crate::schema::coordinates::dsl;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 pub struct Coordinate {
@@ -55,13 +54,13 @@ impl Coordinate {
     ) -> Coordinate {
         Coordinate {
             id: uuid::Uuid::new_v4(),
-            address: address,
-            telephone_no: telephone_no,
-            fax: fax,
-            cellphone_no: cellphone_no,
-            email: email,
-            company_name: company_name,
-            company_number: company_number,
+            address,
+            telephone_no,
+            fax,
+            cellphone_no,
+            email,
+            company_name,
+            company_number,
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),

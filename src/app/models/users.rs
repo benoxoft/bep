@@ -1,20 +1,18 @@
 use crate::schema::users;
+use crate::schema::users::dsl;
+use crate::utils::{HASHER, PWD_SCHEME_VERSION};
 
 use chrono::Utc;
 use chrono::naive::NaiveDateTime;
 
-use serde_derive::{Deserialize, Serialize};
-
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
-use std::vec::Vec;
-
-use crate::utils::{HASHER, PWD_SCHEME_VERSION};
-use crate::schema::users::dsl;
-
 use libreauth::pass::HashBuilder;
 
+use serde_derive::{Deserialize, Serialize};
+
+use std::vec::Vec;
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 pub struct User {
@@ -58,12 +56,12 @@ impl User {
     ) -> User {
         User {
             id: uuid::Uuid::new_v4(),
-            permission: permission,
-            full_name: full_name,
-            email: email,
+            permission,
+            full_name,
+            email,
             password: HASHER.hash(&password).unwrap(),
-            job_title: job_title,
-            profile_picture: profile_picture,
+            job_title,
+            profile_picture,
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),

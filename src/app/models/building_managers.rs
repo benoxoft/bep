@@ -1,20 +1,15 @@
 use crate::schema::building_managers;
+use crate::schema::building_managers::dsl;
 
 use chrono::Utc;
 use chrono::naive::NaiveDateTime;
 
-use serde_derive::{Deserialize, Serialize};
-
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
+use serde_derive::{Deserialize, Serialize};
+
 use std::vec::Vec;
-
-//use super::coordinates::Coordinate;
-//use super::users::User;
-
-use crate::schema::building_managers::dsl;
-
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 #[changeset_options(treat_none_as_null = "true")]
@@ -53,10 +48,10 @@ impl BuildingManager {
     ) -> BuildingManager {
         BuildingManager {
             id: uuid::Uuid::new_v4(),
-            full_name: full_name,
-            profile_picture: profile_picture,
-            coordinates_id: coordinates_id,
-            linked_user_id: linked_user_id,
+            full_name,
+            profile_picture,
+            coordinates_id,
+            linked_user_id,
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),

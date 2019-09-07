@@ -1,14 +1,13 @@
 use crate::schema::building_owners;
+use crate::schema::building_owners::dsl;
 
 use chrono::Utc;
 use chrono::naive::NaiveDateTime;
 
-use serde_derive::{Deserialize, Serialize};
-
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
-use crate::schema::building_owners::dsl;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 #[changeset_options(treat_none_as_null = "true")]
@@ -50,11 +49,11 @@ impl BuildingOwner {
     ) -> BuildingOwner {
         BuildingOwner {
             id: uuid::Uuid::new_v4(),
-            full_name: full_name,
-            is_manager: is_manager,
-            manager_id: manager_id,
-            linked_user_id: linked_user_id,
-            coordinates_id: coordinates_id,
+            full_name,
+            is_manager,
+            manager_id,
+            linked_user_id,
+            coordinates_id,
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),
