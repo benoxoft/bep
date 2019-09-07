@@ -104,10 +104,11 @@ table! {
     registers (id) {
         id -> Uuid,
         name -> Varchar,
+        building_id -> Uuid,
         deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        deleted_at -> Nullable<Timestamp>,
+        deleted_at -> Timestamp,
     }
 }
 
@@ -138,6 +139,7 @@ joinable!(buildings -> users (respondant_id));
 joinable!(entities_history -> entities_files (file_id));
 joinable!(entities_history -> users (user_id));
 joinable!(entities_notes -> users (user_id));
+joinable!(registers -> buildings (building_id));
 
 allow_tables_to_appear_in_same_query!(
     building_managers,

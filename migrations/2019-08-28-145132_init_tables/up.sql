@@ -62,7 +62,7 @@ SELECT diesel_manage_updated_at('building_managers');
 --
 
 CREATE TABLE building_owners (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     full_name VARCHAR DEFAULT '' NOT NULL,
     is_manager BOOL DEFAULT FALSE NOT NULL,
     manager_id UUID REFERENCES building_managers(id),
@@ -80,7 +80,7 @@ SELECT diesel_manage_updated_at('building_owners');
 --
 
 CREATE TABLE buildings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     owner_id UUID NOT NULL REFERENCES building_owners(id),
     manager_id UUID NOT NULL REFERENCES building_managers(id),
     respondant_id UUID NOT NULL REFERENCES users(id),
@@ -97,12 +97,13 @@ SELECT diesel_manage_updated_at('buildings');
 --
 
 CREATE TABLE registers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "name" VARCHAR NOT NULL,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    "name" VARCHAR DEFAULT '' NOT NULL,
+    building_id UUID NOT NULL REFERENCES buildings(id),
     deleted BOOL DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('registers');

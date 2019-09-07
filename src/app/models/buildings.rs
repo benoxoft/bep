@@ -63,7 +63,11 @@ impl Building {
         }
     }
 
-    fn insert(conn: &PgConnection, building: &Building) -> Building {
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
+    
+    pub(super) fn insert(conn: &PgConnection, building: &Building) -> Building {
         diesel::insert_into(buildings::table)
             .values(building)
             .get_result(conn)
