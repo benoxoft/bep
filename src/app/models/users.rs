@@ -99,7 +99,11 @@ impl User {
 
     }
 
-    fn insert(conn: &PgConnection, user: &User) -> User {
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
+
+    pub(super) fn insert(conn: &PgConnection, user: &User) -> User {
         diesel::insert_into(users::table)
             .values(user)
             .get_result(conn)
@@ -125,34 +129,40 @@ impl User {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::{User, Connection};
-    use crate::db;
-    use diesel::result::Error;
+pub mod test_functions {
+    use super::User;
 
-    fn create_test_user() -> User {
+    pub fn create_test_user(unique: String) -> User {
         let permission = 1;
-        let full_name = String::from("Lucien Lachance");
-        let email = String::from("llachance@gmail.com");
-        let password = String::from("supersecretpassword");
-        let job_title = String::from("Gestionnaire");
-        let profile_picture = String::from("test.png");
+        let full_name = format!("USER NAME {}", unique);
+        let email = format!("email@gmail.com {}", unique);
+        let password = format!("supersecretpassword {}", unique);
+        let job_title = format!("Gestionnaire {}", unique);
+        let profile_picture = format!("test.png {}", unique);
         
         User::new(permission, full_name, email, password, job_title, profile_picture)
-
     }
+
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{User, Connection};
+    use super::test_functions::*;
+    use crate::db;
+    use diesel::result::Error;
 
     #[test]
     fn test_create_new_user() {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let user = create_test_user();
+            let user = create_test_user(String::from("TEST"));
             User::insert(&conn, &user);
             let stored_user = User::get_one_by_id(&conn, user.id);
             
             assert_eq!(stored_user, user);
-            assert_ne!(user.password, "supersecretpassword");
+            assert_ne!(user.password, "supersecretpassword TEST");
 
             Ok(())
         });
@@ -163,13 +173,13 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let mut user = create_test_user();
+            let mut user = create_test_user(String::from("TEST"));
             User::insert(&conn, &user);
 
             user.full_name = String::from("Bernard Landry");
             user.permission = 1;
             user.email = String::from("blandry@gmail.com");
-            user.change_password("supersecretpassword".to_owned(), "changedpassword".to_owned()).expect("Should not happen.");
+            user.change_password("supersecretpassword TEST".to_owned(), "changedpassword".to_owned()).expect("Should not happen.");
             user.job_title = String::from("Coordinateur");
             user.profile_picture = String::from("new_picture.png");
             user.deleted = true;

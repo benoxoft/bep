@@ -23,8 +23,8 @@ fn index(_req: HttpRequest) -> impl Responder {
 }
 
 fn index2() -> impl Responder {
-    let b = app::models::buildings::Building::new("fea".to_owned(), "segvr".to_owned());
-    HttpResponse::Ok().json(b)
+    //let b = app::models::buildings::Building::new("fea".to_owned(), "segvr".to_owned());
+    //HttpResponse::Ok().json(b)
 }
 
 fn main() {

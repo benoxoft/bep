@@ -17,6 +17,7 @@ use crate::schema::building_managers::dsl;
 
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
+#[changeset_options(treat_none_as_null = "true")]
 pub struct BuildingManager {
     id: uuid::Uuid,
     full_name: String,
@@ -63,7 +64,11 @@ impl BuildingManager {
         }
     }
 
-    fn insert(conn: &PgConnection, buildm: &BuildingManager) -> BuildingManager {
+    pub fn id(&self) -> uuid::Uuid {
+        self.id 
+    }
+
+    pub(super) fn insert(conn: &PgConnection, buildm: &BuildingManager) -> BuildingManager {
         diesel::insert_into(building_managers::table)
             .values(buildm)
             .get_result(conn)
@@ -84,25 +89,55 @@ impl BuildingManager {
 }
 
 #[cfg(test)]
+pub mod test_functions {
+    use super::BuildingManager;
+    use super::super::coordinates::{Coordinate, test_functions::*};
+    use super::super::users::{User, test_functions::*};
+
+    use diesel::PgConnection;
+
+    pub fn create_test_building_manager1(conn: &PgConnection, unique: String) -> BuildingManager {
+        let test_coord = create_test_coordinate1();
+        Coordinate::insert(&conn, &test_coord);
+
+        let test_user = create_test_user(String::from(unique));
+        User::insert(&conn, &test_user);
+
+        BuildingManager::new(
+            String::from("MANAGER NAME #1"), 
+            String::from("PROFILE PICTURE #1").into_bytes(),
+            Some(test_coord.id()),
+            Some(test_user.id()))
+    }
+
+    pub fn create_test_building_manager2(conn: &PgConnection, unique: String) -> BuildingManager {
+        let test_coord = create_test_coordinate1();
+        Coordinate::insert(&conn, &test_coord);
+
+        let test_user = create_test_user(String::from(unique));
+        User::insert(&conn, &test_user);
+
+        BuildingManager::new(
+            String::from("MANAGER NAME #2"), 
+            String::from("PROFILE PICTURE #2").into_bytes(),
+            Some(test_coord.id()),
+            Some(test_user.id()))
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::{BuildingManager, Connection};
+    use super::test_functions::*;
     use crate::db;
     use diesel::result::Error;
     
-    fn create_test_building_manager() -> BuildingManager {
-        BuildingManager::new(
-            String::from("MANAGER NAME"), 
-            String::from("PROFILE PICTURE").into_bytes(), 
-            None, 
-            None)
-    }
-
     #[test]
     fn test_insert_building_manager() {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let bm = create_test_building_manager();
+            let bm = create_test_building_manager1(&conn, String::from("BM1"));
             BuildingManager::insert(&conn, &bm);
             let stored_bm = BuildingManager::get_one_by_id(&conn, bm.id);
             assert_eq!(bm, stored_bm);
@@ -116,7 +151,7 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let mut bm = create_test_building_manager();
+            let mut bm = create_test_building_manager2(&conn, String::from("BM2"));
             BuildingManager::insert(&conn, &bm);
             assert_eq!(bm, BuildingManager::get_one_by_id(&conn, bm.id));
             bm.coordinates_id = None;

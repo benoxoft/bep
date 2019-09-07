@@ -65,11 +65,15 @@ impl Coordinate {
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),
-            deleted_at: Utc::now().naive_utc()
+            deleted_at: NaiveDateTime::from_timestamp(0, 0)
         }
     }
 
-    fn insert(conn: &PgConnection, coordinate: &Coordinate) -> Coordinate {
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
+
+    pub(super) fn insert(conn: &PgConnection, coordinate: &Coordinate) -> Coordinate {
         diesel::insert_into(coordinates::table)
             .values(coordinate)
             .get_result(conn)
@@ -91,27 +95,44 @@ impl Coordinate {
 }
 
 #[cfg(test)]
+pub mod test_functions {
+    use super::Coordinate;
+
+    pub fn create_test_coordinate1() -> Coordinate {
+        Coordinate::new(String::from("STREET ADDRESS   #1"),
+                        String::from("TELEPHONE NUMBER #1"),
+                        String::from("FAX NUMBER       #1"),
+                        String::from("CELLPHONE NUMBER #1"),
+                        String::from("email@gmail.com  #1"),
+                        String::from("COMPANY NAME     #1"),
+                        String::from("COMPANY NUMBER   #1"))
+    }
+
+    pub fn create_test_coordinate2() -> Coordinate {
+        Coordinate::new(String::from("STREET ADDRESS   #2"),
+                        String::from("TELEPHONE NUMBER #2"),
+                        String::from("FAX NUMBER       #2"),
+                        String::from("CELLPHONE NUMBER #2"),
+                        String::from("email@gmail.com  #2"),
+                        String::from("COMPANY NAME     #2"),
+                        String::from("COMPANY NUMBER   #2"))
+    }
+
+}
+
+#[cfg(test)]
 mod tests {
     use super::{Coordinate, Connection};
+    use super::test_functions::*;
     use crate::db;
     use diesel::result::Error;
-
-    fn create_test_coordinate() -> Coordinate {
-        Coordinate::new(String::from("123 rue du Sablier"),
-                        String::from("TELEPHONE NUMBER"),
-                        String::from("FAX NUMBER"),
-                        String::from("CELLPHONE NUMBER"),
-                        String::from("email@gmail.com"),
-                        String::from("COMPANY NAME"),
-                        String::from("COMPANY NUMBER"))
-    }
 
     #[test]
     fn test_create_coordinate() {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let coord = create_test_coordinate();
+            let coord = create_test_coordinate1();
             Coordinate::insert(&conn, &coord);
             let stored_coord = Coordinate::get_one_by_id(&conn, coord.id);
             assert_eq!(stored_coord, coord);
@@ -126,7 +147,7 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let mut coord = create_test_coordinate();
+            let mut coord = create_test_coordinate1();
             Coordinate::insert(&conn, &coord);
             assert_eq!(coord, Coordinate::get_one_by_id(&conn, coord.id));
             coord.address = String::from("NEW TEST ADDRESS");

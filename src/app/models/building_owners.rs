@@ -1,6 +1,7 @@
 use crate::schema::building_owners;
 
 use chrono::Utc;
+use chrono::naive::NaiveDateTime;
 
 use serde_derive::{Deserialize, Serialize};
 
@@ -10,6 +11,7 @@ use diesel::pg::PgConnection;
 use crate::schema::building_owners::dsl;
 
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
+#[changeset_options(treat_none_as_null = "true")]
 pub struct BuildingOwner {
     id: uuid::Uuid,
     full_name: String,
@@ -56,11 +58,15 @@ impl BuildingOwner {
             deleted: false,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),
-            deleted_at: Utc::now().naive_utc()
+            deleted_at: NaiveDateTime::from_timestamp(0, 0)
         }
     }
 
-    fn insert(conn: &PgConnection, bo: &BuildingOwner) -> BuildingOwner {
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
+
+    pub(super) fn insert(conn: &PgConnection, bo: &BuildingOwner) -> BuildingOwner {
         diesel::insert_into(building_owners::table)
             .values(bo)
             .get_result(conn)
@@ -81,21 +87,62 @@ impl BuildingOwner {
 }
 
 #[cfg(test)]
+pub mod test_functions {
+    use super::BuildingOwner;
+    use super::super::building_managers::{BuildingManager, test_functions::*};
+    use super::super::users::{User, test_functions::*};
+    use super::super::coordinates::{Coordinate, test_functions::*};
+
+    use diesel::PgConnection;
+
+    pub fn create_test_building_owner1(conn: &PgConnection) -> BuildingOwner {
+        let test_manager = create_test_building_manager1(&conn, String::from("MANAGER BO1"));
+        BuildingManager::insert(&conn, &test_manager);
+
+        let test_user = create_test_user(String::from("BO1"));
+        User::insert(&conn, &test_user);
+
+        let test_coord = create_test_coordinate1();
+        Coordinate::insert(&conn, &test_coord);
+
+        BuildingOwner::new(String::from("FULL NAME #1"), 
+                           false, 
+                           Some(test_manager.id()),
+                           Some(test_user.id()),
+                           Some(test_coord.id()))
+    }
+
+    pub fn create_test_building_owner2(conn: &PgConnection) -> BuildingOwner {
+        let test_manager = create_test_building_manager2(&conn, String::from("MANAGER BO2"));
+        BuildingManager::insert(&conn, &test_manager);
+
+        let test_user = create_test_user(String::from("BO2"));
+        User::insert(&conn, &test_user);
+
+        let test_coord = create_test_coordinate2();
+        Coordinate::insert(&conn, &test_coord);
+
+        BuildingOwner::new(String::from("FULL NAME #2"), 
+                           false, 
+                           Some(test_manager.id()),
+                           Some(test_user.id()),
+                           Some(test_coord.id()))
+    }
+
+}
+
+#[cfg(test)]
 mod tests {
-    use super::{BuildingOwner, Connection};
+    use super::{BuildingOwner, Connection, test_functions::*};
     use crate::db;
     use diesel::result::Error;
-
-    fn create_test_building_owner() -> BuildingOwner {
-        BuildingOwner::new(String::from("FULL NAME"), false, None, None, None)
-    }
 
     #[test]
     fn test_create_building_owner() {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let bo = create_test_building_owner();
+            let bo = create_test_building_owner1(&conn);
             BuildingOwner::insert(&conn, &bo);
             let stored_bo = BuildingOwner::get_one_by_id(&conn, bo.id);
             assert_eq!(bo, stored_bo);
@@ -109,7 +156,7 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let mut bo = create_test_building_owner();
+            let mut bo = create_test_building_owner2(&conn);
             
             BuildingOwner::insert(&conn, &bo);
             assert_eq!(bo, BuildingOwner::get_one_by_id(&conn, bo.id));
@@ -123,12 +170,12 @@ mod tests {
             BuildingOwner::update(&conn, &bo);
             let saved_bo = BuildingOwner::get_one_by_id(&conn, bo.id);
 
-            assert_eq!(bo.coordinates_id, saved_bo.coordinates_id);
             assert_eq!(bo.deleted, saved_bo.deleted);
             assert_eq!(bo.full_name, saved_bo.full_name);
             assert_eq!(bo.is_manager, saved_bo.is_manager);
             assert_eq!(bo.linked_user_id, saved_bo.linked_user_id);
             assert_eq!(bo.manager_id, saved_bo.manager_id);
+            assert_eq!(bo.coordinates_id, saved_bo.coordinates_id);
 
             Ok(())
         });
