@@ -82,12 +82,9 @@ impl File {
 #[cfg(test)]
 pub mod test_functions {
     use super::File;
-    use super::super::registers::{Register, test_functions::*};
     use diesel::PgConnection;
 
     pub fn create_test_file(conn: &PgConnection) -> File {
-        let register = create_test_register(&conn);
-        Register::insert(&conn, &register);
         File::new(
             String::from("FILENAME.TXT"), 
             String::from("URL OF FILE"), 
