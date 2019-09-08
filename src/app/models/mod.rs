@@ -6,5 +6,6 @@ pub mod coordinates;
 pub mod entities_files;
 pub mod entities_history;
 pub mod entities_notes;
+pub mod files;
 pub mod registers;
 pub mod users;

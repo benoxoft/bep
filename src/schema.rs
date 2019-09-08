@@ -60,16 +60,13 @@ table! {
 }
 
 table! {
-    entities_files (id) {
-        id -> Uuid,
+    entities_files (file_id, entity_id) {
+        file_id -> Uuid,
         entity_id -> Uuid,
-        filename -> Varchar,
-        url -> Varchar,
-        content -> Nullable<Varchar>,
         deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        deleted_at -> Nullable<Timestamp>,
+        deleted_at -> Timestamp,
     }
 }
 
@@ -97,6 +94,19 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         deleted_at -> Nullable<Timestamp>,
+    }
+}
+
+table! {
+    files (id) {
+        id -> Uuid,
+        filename -> Varchar,
+        url -> Varchar,
+        content -> Varchar,
+        deleted -> Bool,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        deleted_at -> Timestamp,
     }
 }
 
@@ -136,7 +146,8 @@ joinable!(building_owners -> users (linked_user_id));
 joinable!(buildings -> building_managers (manager_id));
 joinable!(buildings -> building_owners (owner_id));
 joinable!(buildings -> users (respondant_id));
-joinable!(entities_history -> entities_files (file_id));
+joinable!(entities_files -> files (file_id));
+joinable!(entities_history -> files (file_id));
 joinable!(entities_history -> users (user_id));
 joinable!(entities_notes -> users (user_id));
 joinable!(registers -> buildings (building_id));
@@ -149,6 +160,7 @@ allow_tables_to_appear_in_same_query!(
     entities_files,
     entities_history,
     entities_notes,
+    files,
     registers,
     users,
 );

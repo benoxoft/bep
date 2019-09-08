@@ -110,29 +110,40 @@ SELECT diesel_manage_updated_at('registers');
 
 --
 
-
-CREATE TABLE entities_files (
+CREATE TABLE files (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    entity_id UUID NOT NULL,
     "filename" VARCHAR NOT NULL,
     "url" VARCHAR NOT NULL,
-    content VARCHAR DEFAULT '',
+    content VARCHAR DEFAULT '' NOT NULL,
     deleted BOOL DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
+);
+
+SELECT diesel_manage_updated_at('files');
+
+--
+
+CREATE TABLE entities_files (
+    file_id UUID NOT NULL REFERENCES files(id),
+    entity_id UUID NOT NULL,
+    PRIMARY KEY (file_id, entity_id),
+    deleted BOOL DEFAULT FALSE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('entities_files');
 
 --
 
-
 CREATE TABLE entities_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     entity_id UUID NOT NULL,
     action_id SMALLINT NOT NULL,
-    file_id UUID NOT NULL REFERENCES entities_files(id),
+    file_id UUID NOT NULL REFERENCES files(id),
     user_id UUID NOT NULL REFERENCES users(id),
     deleted BOOL DEFAULT 0::BOOL NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

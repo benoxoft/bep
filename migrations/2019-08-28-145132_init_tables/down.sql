@@ -3,6 +3,7 @@
 DROP TABLE entities_notes;
 DROP TABLE entities_history;
 DROP TABLE entities_files;
+DROP TABLE files;
 DROP TABLE registers;
 DROP TABLE buildings;
 DROP TABLE building_owners;
