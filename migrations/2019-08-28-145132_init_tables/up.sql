@@ -145,7 +145,7 @@ CREATE TABLE entities_history (
     action_id SMALLINT NOT NULL,
     file_id UUID NOT NULL REFERENCES files(id),
     user_id UUID NOT NULL REFERENCES users(id),
-    deleted BOOL DEFAULT 0::BOOL NOT NULL,
+    deleted BOOL DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
@@ -161,10 +161,10 @@ CREATE TABLE entities_notes (
     entity_id UUID NOT NULL,
     user_id UUID NOT NULL REFERENCES users(id),
     note VARCHAR DEFAULT '' NOT NULL,
-    deleted BOOL DEFAULT 0::BOOL NOT NULL,
+    deleted BOOL DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('entities_notes');
