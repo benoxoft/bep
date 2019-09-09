@@ -148,7 +148,7 @@ CREATE TABLE entities_history (
     deleted BOOL DEFAULT 0::BOOL NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP DEFAULT TO_TIMESTAMP(0) NOT NULL
 );
 
 SELECT diesel_manage_updated_at('entities_history');
