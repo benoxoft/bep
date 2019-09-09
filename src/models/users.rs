@@ -17,6 +17,7 @@ use std::vec::Vec;
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 pub struct User {
     id: uuid::Uuid,
+    org_id: uuid::Uuid,
     permission: i16,
     full_name: String,
     email: String,
@@ -32,6 +33,7 @@ pub struct User {
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id &&
+        self.org_id == other.org_id &&
         self.permission == other.permission &&
         self.full_name == other.full_name &&
         self.email == other.email &&
@@ -47,6 +49,7 @@ impl PartialEq for User {
 
 impl User {
     pub fn new(
+        org_id: uuid::Uuid,
         permission: i16,
         full_name: String,
         email: String,
@@ -56,6 +59,7 @@ impl User {
     ) -> User {
         User {
             id: uuid::Uuid::new_v4(),
+            org_id,
             permission,
             full_name,
             email,
@@ -129,16 +133,23 @@ impl User {
 #[cfg(test)]
 pub mod test_functions {
     use super::User;
+    use super::super::organizations::{Organization, test_functions::*};
 
-    pub fn create_test_user(unique: String) -> User {
-        let permission = 1;
-        let full_name = format!("USER NAME {}", unique);
-        let email = format!("email@gmail.com {}", unique);
-        let password = format!("supersecretpassword {}", unique);
-        let job_title = format!("Gestionnaire {}", unique);
-        let profile_picture = format!("test.png {}", unique);
-        
-        User::new(permission, full_name, email, password, job_title, profile_picture)
+    use diesel::PgConnection;
+
+    pub fn create_test_user(conn: &PgConnection, unique: String) -> User {
+        let test_org = create_test_organization1(&conn);
+        Organization::insert(&conn, &test_org);
+
+        User::new(
+            test_org.id(),
+            1, 
+            format!("USER NAME {}", unique), 
+            format!("email@gmail.com {}", unique), 
+            format!("supersecretpassword {}", unique), 
+            format!("Gestionnaire {}", unique), 
+            format!("test.png {}", unique)
+        )
     }
 
 }
@@ -155,7 +166,7 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let user = create_test_user(String::from("TEST"));
+            let user = create_test_user(&conn, String::from("TEST"));
             User::insert(&conn, &user);
             let stored_user = User::get_one_by_id(&conn, user.id);
             
@@ -171,7 +182,7 @@ mod tests {
         let conn = db::connection::establish_connection();
 
         conn.test_transaction::<_, Error, _>(|| {
-            let mut user = create_test_user(String::from("TEST"));
+            let mut user = create_test_user(&conn, String::from("TEST"));
             User::insert(&conn, &user);
 
             user.full_name = String::from("Bernard Landry");

@@ -9,7 +9,7 @@ use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder, get}
 use listenfd::ListenFd;
 
 pub mod schema;
-pub mod app;
+pub mod models;
 pub mod db;
 pub mod utils;
 

@@ -16,7 +16,7 @@ use std::vec::Vec;
 pub struct Building {
     id: uuid::Uuid,
     owner_id: uuid::Uuid,
-    manager_id: uuid::Uuid,
+    org_id: uuid::Uuid,
     respondant_id: uuid::Uuid,
     name: String,
     address: String,
@@ -30,7 +30,7 @@ impl PartialEq for Building {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id &&
         self.owner_id == other.owner_id &&
-        self.manager_id == other.manager_id &&
+        self.org_id == other.org_id &&
         self.respondant_id == other.respondant_id &&
         self.name == other.name &&
         self.address == other.address &&
@@ -44,7 +44,7 @@ impl PartialEq for Building {
 impl Building {
     pub fn new(
         owner_id: uuid::Uuid,
-        manager_id: uuid::Uuid,
+        org_id: uuid::Uuid,
         respondant_id: uuid::Uuid,
         name: String, 
         address: String,
@@ -52,7 +52,7 @@ impl Building {
         Building {
             id: uuid::Uuid::new_v4(),
             owner_id,
-            manager_id,
+            org_id,
             respondant_id,
             name,
             address,
@@ -98,7 +98,7 @@ pub mod test_functions {
     use super::{Building, Connection};
     use diesel::pg::PgConnection;
     
-    use super::super::building_managers::{BuildingManager, test_functions::*};
+    use super::super::organizations::{Organization, test_functions::*};
     use super::super::building_owners::{BuildingOwner, test_functions::*};
     use super::super::users::{User, test_functions::*};
 
@@ -106,10 +106,10 @@ pub mod test_functions {
         let test_owner = create_test_building_owner1(&conn);
         BuildingOwner::insert(conn, &test_owner);
 
-        let test_manager = create_test_building_manager1(&conn, String::from("MANAGER BUILDING1"));
-        BuildingManager::insert(conn, &test_manager);
+        let test_manager = create_test_organization1(&conn);
+        Organization::insert(conn, &test_manager);
 
-        let test_respondant = create_test_user(String::from("RESPONDANT BUILDING1"));
+        let test_respondant = create_test_user(&conn, String::from("RESPONDANT BUILDING1"));
         User::insert(conn, &test_respondant);
 
         Building::new(
@@ -124,10 +124,10 @@ pub mod test_functions {
         let test_owner = create_test_building_owner2(&conn);
         BuildingOwner::insert(conn, &test_owner);
 
-        let test_manager = create_test_building_manager2(&conn, String::from("MANAGER BUILDING2"));
-        BuildingManager::insert(conn, &test_manager);
+        let test_manager = create_test_organization2(&conn);
+        Organization::insert(conn, &test_manager);
 
-        let test_respondant = create_test_user(String::from("RESPONDANT BUILDING2"));
+        let test_respondant = create_test_user(&conn, String::from("RESPONDANT BUILDING2"));
         User::insert(conn, &test_respondant);
 
         Building::new(

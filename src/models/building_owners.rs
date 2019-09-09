@@ -9,13 +9,21 @@ use diesel::pg::PgConnection;
 
 use serde_derive::{Deserialize, Serialize};
 
+pub struct NewBuildingOwner {
+    full_name: String,
+    is_manager: bool,
+    org_id: Option<uuid::Uuid>,
+    linked_user_id: Option<uuid::Uuid>,
+    coordinates_id: Option<uuid::Uuid>
+}
+
 #[derive(Insertable, Queryable, Identifiable, AsChangeset, Debug, Serialize, Deserialize)]
 #[changeset_options(treat_none_as_null = "true")]
 pub struct BuildingOwner {
     id: uuid::Uuid,
     full_name: String,
     is_manager: bool,
-    manager_id: Option<uuid::Uuid>,
+    org_id: Option<uuid::Uuid>,
     linked_user_id: Option<uuid::Uuid>,
     coordinates_id: Option<uuid::Uuid>,
     deleted: bool,
@@ -29,7 +37,7 @@ impl PartialEq for BuildingOwner {
         self.id == other.id &&
         self.full_name == other.full_name &&
         self.is_manager == other.is_manager &&
-        self.manager_id == other.manager_id &&
+        self.org_id == other.org_id &&
         self.linked_user_id == other.linked_user_id &&
         self.coordinates_id == other.coordinates_id &&
         self.deleted == other.deleted &&
@@ -43,7 +51,7 @@ impl BuildingOwner {
     pub fn new(
         full_name: String,
         is_manager: bool,
-        manager_id: Option<uuid::Uuid>,
+        org_id: Option<uuid::Uuid>,
         linked_user_id: Option<uuid::Uuid>,
         coordinates_id: Option<uuid::Uuid>
     ) -> BuildingOwner {
@@ -51,7 +59,7 @@ impl BuildingOwner {
             id: uuid::Uuid::new_v4(),
             full_name,
             is_manager,
-            manager_id,
+            org_id,
             linked_user_id,
             coordinates_id,
             deleted: false,
@@ -88,17 +96,17 @@ impl BuildingOwner {
 #[cfg(test)]
 pub mod test_functions {
     use super::BuildingOwner;
-    use super::super::building_managers::{BuildingManager, test_functions::*};
+    use super::super::organizations::{Organization, test_functions::*};
     use super::super::users::{User, test_functions::*};
     use super::super::coordinates::{Coordinate, test_functions::*};
 
     use diesel::PgConnection;
 
     pub fn create_test_building_owner1(conn: &PgConnection) -> BuildingOwner {
-        let test_manager = create_test_building_manager1(&conn, String::from("MANAGER BO1"));
-        BuildingManager::insert(&conn, &test_manager);
+        let test_manager = create_test_organization1(&conn);
+        Organization::insert(&conn, &test_manager);
 
-        let test_user = create_test_user(String::from("BO1"));
+        let test_user = create_test_user(&conn, String::from("BO1"));
         User::insert(&conn, &test_user);
 
         let test_coord = create_test_coordinate1();
@@ -112,10 +120,10 @@ pub mod test_functions {
     }
 
     pub fn create_test_building_owner2(conn: &PgConnection) -> BuildingOwner {
-        let test_manager = create_test_building_manager2(&conn, String::from("MANAGER BO2"));
-        BuildingManager::insert(&conn, &test_manager);
+        let test_manager = create_test_organization2(&conn);
+        Organization::insert(&conn, &test_manager);
 
-        let test_user = create_test_user(String::from("BO2"));
+        let test_user = create_test_user(&conn, String::from("BO2"));
         User::insert(&conn, &test_user);
 
         let test_coord = create_test_coordinate2();
@@ -164,7 +172,7 @@ mod tests {
             bo.full_name = String::from("NEW FULL NAME");
             bo.is_manager = true;
             bo.linked_user_id = None;
-            bo.manager_id = None;
+            bo.org_id = None;
             
             BuildingOwner::update(&conn, &bo);
             let saved_bo = BuildingOwner::get_one_by_id(&conn, bo.id);
@@ -173,7 +181,7 @@ mod tests {
             assert_eq!(bo.full_name, saved_bo.full_name);
             assert_eq!(bo.is_manager, saved_bo.is_manager);
             assert_eq!(bo.linked_user_id, saved_bo.linked_user_id);
-            assert_eq!(bo.manager_id, saved_bo.manager_id);
+            assert_eq!(bo.org_id, saved_bo.org_id);
             assert_eq!(bo.coordinates_id, saved_bo.coordinates_id);
 
             Ok(())

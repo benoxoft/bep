@@ -88,7 +88,7 @@ pub mod test_functions {
         let test_file = create_test_file(&conn);
         File::insert(&conn, &test_file);
 
-        let test_user = create_test_user(String::from("ENTITY HISTORY"));
+        let test_user = create_test_user(&conn, String::from("ENTITY HISTORY"));
         User::insert(&conn, &test_user);
 
         let test_register = create_test_register(&conn);

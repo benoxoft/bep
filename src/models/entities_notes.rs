@@ -91,7 +91,7 @@ pub mod test_functions {
         let test_building = create_test_building1(&conn);
         Building::insert(&conn, &test_building);
 
-        let test_user = create_test_user(String::from("ENTITIES NOTES"));
+        let test_user = create_test_user(&conn, String::from("ENTITIES NOTES"));
         User::insert(&conn, &test_user);
 
         EntitiesNote::new(

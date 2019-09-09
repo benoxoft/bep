@@ -7,6 +7,6 @@ DROP TABLE files;
 DROP TABLE registers;
 DROP TABLE buildings;
 DROP TABLE building_owners;
-DROP TABLE building_managers;
+DROP TABLE organizations;
 DROP TABLE coordinates;
 DROP TABLE users;
